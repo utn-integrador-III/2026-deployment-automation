@@ -101,7 +101,7 @@ path here.** Option A is shown so you understand where that file comes from.
 
 > Throughout, replace `CHANGE-ME` / `your-name` with something unique to you.
 > App names are **global** across all of Fly, so `fly-demo-backend` is probably taken —
-> use `fly-demo-backend-sergio` or similar.
+> use `fly-demo-backend-myapp` or similar.
 
 ### Step 1 — Deploy the backend
 
@@ -130,7 +130,7 @@ fly deploy
 When it finishes you'll see a URL like `https://fly-demo-backend-sergio.fly.dev`.
 Test it:
 ```bash
-curl https://fly-demo-backend-sergio.fly.dev/api/hello
+curl https://fly-demo-backend-myapp.fly.dev/api/hello
 ```
 You should get back JSON with a `message` and a `region`. **Copy this backend URL** —
 the frontend needs it.
@@ -139,7 +139,7 @@ the frontend needs it.
 
 Edit `frontend/index.html` and change this line near the bottom to your backend URL:
 ```js
-const BACKEND_URL = "https://fly-demo-backend-sergio.fly.dev";
+const BACKEND_URL = "https://fly-demo-backend-myapp.fly.dev";
 ```
 (You can skip this and just paste the URL into the field on the page, but setting it
 here means it works automatically.)
@@ -179,7 +179,7 @@ Run these from inside `backend/` or `frontend/`, or add `-a <app-name>` from any
 
 ### View live logs
 ```bash
-fly logs -a fly-demo-backend-sergio
+fly logs -a fly-demo-backend-myapp
 ```
 
 ### Set an environment variable / secret

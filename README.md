@@ -127,7 +127,7 @@ Open `fly.toml`, change the `app = "..."` line to your unique name, then:
 fly deploy
 ```
 
-When it finishes you'll see a URL like `https://fly-demo-backend-sergio.fly.dev`.
+When it finishes you'll see a URL like `https://fly-demo-backend-myapp.fly.dev`.
 Test it:
 ```bash
 curl https://fly-demo-backend-myapp.fly.dev/api/hello
@@ -190,7 +190,7 @@ Public config can go in `fly.toml`:
 ```
 Sensitive values (API keys, DB passwords) go in **secrets** — encrypted, never in git:
 ```bash
-fly secrets set DATABASE_URL="postgres://..." -a fly-demo-backend-sergio
+fly secrets set DATABASE_URL="postgres://..." -a fly-demo-backend-myapp
 ```
 Setting a secret triggers a new deploy automatically.
 
@@ -254,8 +254,8 @@ The single most common mistake: your app must listen on `0.0.0.0` at the port in
 ## Clean up (do this to stop any charges)
 
 ```bash
-fly apps destroy fly-demo-backend-sergio
-fly apps destroy fly-demo-frontend-sergio
+fly apps destroy fly-demo-backend-myapp
+fly apps destroy fly-demo-frontend-myapp
 ```
 This permanently deletes the apps and their machines.
 

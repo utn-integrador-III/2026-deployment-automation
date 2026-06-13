@@ -208,12 +208,12 @@ fly scale count 2 --region mia,bog
 
 ### SSH into the running container
 ```bash
-fly ssh console -a fly-demo-backend-sergio
+fly ssh console -a fly-demo-backend-myapp
 ```
 
 ### Add a custom domain
 ```bash
-fly certs add api.yourdomain.com -a fly-demo-backend-sergio
+fly certs add api.yourdomain.com -a fly-demo-backend-myapp
 # then add the DNS records Fly tells you to add
 ```
 

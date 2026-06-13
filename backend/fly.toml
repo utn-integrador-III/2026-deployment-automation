@@ -1,0 +1,28 @@
+# Fly.io config for the BACKEND.
+# Rename "app" to something globally unique (e.g. fly-demo-backend-sergio).
+# `fly launch` will generate this for you — this file is here so you can see
+# what every field means.
+
+app = "fly-demo-backend-CHANGE-ME"
+primary_region = "mia"          # Miami — closest Fly region to Costa Rica. See `fly platform regions`.
+
+[build]
+  dockerfile = "Dockerfile"
+
+[http_service]
+  internal_port = 8080          # MUST match the port your app listens on.
+  force_https = true            # Redirect http -> https automatically.
+  auto_stop_machines = "stop"   # Stop the machine when idle...
+  auto_start_machines = true    # ...and start it again on the next request.
+  min_machines_running = 0      # 0 = scale to zero when idle (cheapest for a demo).
+
+  # Fly restarts the machine if this check fails.
+  [[http_service.checks]]
+    interval = "15s"
+    timeout = "2s"
+    method = "GET"
+    path = "/api/health"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "256mb"              # Plenty for this tiny API.

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deploy Demo · Status</title>
+  <style>
+    :root {
+      --bg: #0d0f14;
+      --panel: #151922;
+      --line: #232a36;
+      --text: #e6e9ef;
+      --muted: #8b94a6;
+      --accent: #b388ff;     /* single accent */
+      --online: #4ade80;
+      --offline: #f87171;
+      --mono: ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Menlo, Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; background: var(--bg); color: var(--text);
+      font-family: var(--mono); display: grid; place-items: center; padding: 24px;
+    }
+    .card {
+      width: 100%; max-width: 560px; background: var(--panel);
+      border: 1px solid var(--line); border-radius: 12px; overflow: hidden;
+    }
+    .bar {
+      display: flex; align-items: center; gap: 8px; padding: 12px 16px;
+      border-bottom: 1px solid var(--line); background: #11141b;
+    }
+    .dot { width: 11px; height: 11px; border-radius: 50%; background: #2a3040; }
+    .bar .title { margin-left: 8px; color: var(--muted); font-size: 13px; letter-spacing: .04em; }
+    .body { padding: 24px; }
+    h1 { margin: 0 0 4px; font-size: 18px; font-weight: 600; }
+    .sub { margin: 0 0 20px; color: var(--muted); font-size: 13px; }
+    .status {
+      display: flex; align-items: center; gap: 12px; padding: 14px 16px;
+      border: 1px solid var(--line); border-radius: 8px; margin-bottom: 18px; background: #11141b;
+    }
+    .signal { width: 12px; height: 12px; border-radius: 50%; background: var(--muted); flex: none; }
+    .signal.checking { background: var(--accent); animation: pulse 1s ease-in-out infinite; }
+    .signal.online { background: var(--online); box-shadow: 0 0 0 4px rgba(74,222,128,.15); }
+    .signal.offline { background: var(--offline); box-shadow: 0 0 0 4px rgba(248,113,113,.15); }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+    .status .label { font-size: 14px; }
+    .status .region { margin-left: auto; font-size: 12px; color: var(--muted); }
+    label { display: block; font-size: 12px; color: var(--muted); margin: 0 0 6px; }
+    .row { display: flex; gap: 8px; }
+    input {
+      flex: 1; background: var(--bg); border: 1px solid var(--line); color: var(--text);
+      padding: 10px 12px; border-radius: 8px; font-family: var(--mono); font-size: 13px;
+    }
+    input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+    button {
+      background: var(--accent); color: #160c2b; border: 0; padding: 10px 16px;
+      border-radius: 8px; font-family: var(--mono); font-weight: 600; cursor: pointer;
+    }
+    button:hover { filter: brightness(1.08); }
+    pre {
+      margin: 16px 0 0; padding: 14px; background: var(--bg); border: 1px solid var(--line);
+      border-radius: 8px; color: var(--muted); font-size: 12px; overflow-x: auto; white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="bar">
+      <span class="dot" style="background:#f87171"></span>
+      <span class="dot" style="background:#fbbf24"></span>
+      <span class="dot" style="background:#4ade80"></span>
+      <span class="title">deploy-demo — frontend</span>
+    </div>
+    <div class="body">
+      <h1>Backend connection</h1>
+      <p class="sub">This page lives in one Fly app and calls the API in another.</p>
+
+      <div class="status">
+        <span id="signal" class="signal checking"></span>
+        <span id="label" class="label">Checking backend…</span>
+        <span id="region" class="region"></span>
+      </div>
+
+      <label for="url">Backend URL</label>
+      <div class="row">
+        <input id="url" type="text" spellcheck="false" />
+        <button id="retry">Retry</button>
+      </div>
+
+      <pre id="out">Waiting for response…</pre>
+    </div>
+  </main>
+
+  <script>
+    // 1) Edit this to your backend's public URL after you deploy it,
+    //    e.g. "https://fly-demo-backend-sergio.fly.dev".
+    // 2) Or just paste it into the field on the page and hit Retry.
+    const BACKEND_URL = "http://localhost:8080";
+
+    const $ = (id) => document.getElementById(id);
+    $("url").value = BACKEND_URL;
+
+    function setState(state, label, region) {
+      $("signal").className = "signal " + state;
+      $("label").textContent = label;
+      $("region").textContent = region ? "region: " + region : "";
+    }
+
+    async function check() {
+      const base = $("url").value.replace(/\/+$/, "");
+      setState("checking", "Checking backend…", "");
+      $("out").textContent = "GET " + base + "/api/hello";
+      try {
+        const res = await fetch(base + "/api/hello");
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json();
+        setState("online", "Backend online", data.region);
+        $("out").textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        setState("offline", "Cannot reach backend", "");
+        $("out").textContent =
+          "Error: " + err.message +
+          "\n\nCheck that the backend is deployed and the URL above is correct.";
+      }
+    }
+
+    $("retry").addEventListener("click", check);
+    check();
+  </script>
+</body>
+</html>
